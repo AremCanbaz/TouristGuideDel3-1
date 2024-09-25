@@ -14,14 +14,11 @@ import java.util.Set;
 @Controller
 public class TouristController {
 
-    private TouristRepository touristRepository;
-
     private final TouristService touristService;
 
     @Autowired
     public TouristController(TouristService touristService, TouristRepository touristRepository) {
         this.touristService = touristService;
-        this.touristRepository = touristRepository;
     }
 
     @GetMapping()
