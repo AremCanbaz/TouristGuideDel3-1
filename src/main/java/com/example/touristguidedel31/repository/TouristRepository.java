@@ -26,7 +26,7 @@ public class TouristRepository {
         }
         return tags;
     }
-    public static Set<String> getAllDistrict() {
+    public static Set<String> getAllDistricts() {
         Set<String> district = new HashSet<>();
         for (TouristAttraction attraction : attractions) {
             district.addAll(attraction.getDistrict());

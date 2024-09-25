@@ -113,13 +113,13 @@ class TouristControllerTest {
         mockMvc.perform(post("/update")
                         .param("name", mockAttraction.getName())
                         .param("description", mockAttraction.getDescription())
-                        .param("locations", String.join(",", mockAttraction.getDistrict()))
+                        .param("district", String.join(",", mockAttraction.getDistrict()))
                         .param("tags", String.join(",", mockAttraction.getTags())))
                 .andExpect(status().is3xxRedirection()) // Forvent en 3xx omdirigering
                 .andExpect(redirectedUrl("/")); // Forvent at omdirigere til root URL
 
         // Bekræft at touristService.updateAttraction blev kaldt med den rigtige attraktion
-        verify(touristRepository).updateAttraction(mockAttraction);
+        verify(touristService).updateAttraction(mockAttraction);
     }
 
     @Test

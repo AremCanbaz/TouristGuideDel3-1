@@ -29,7 +29,7 @@ public class TouristService {
     }
 
     public static Set<String> getAllDistricts() {
-        return TouristRepository.getAllDistrict();
+        return TouristRepository.getAllDistricts();
     }
 
     // Get an attraction by name

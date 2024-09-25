@@ -30,7 +30,7 @@ public class TouristController {
 
     @GetMapping("/createAttraction")
     public String createAttraction(Model model) {
-        Set<String> allTowns = TouristRepository.getAllDistrict(); // Brug instansen af touristRepository
+        Set<String> allTowns = TouristRepository.getAllDistricts(); // Brug instansen af touristRepository
         Set<String> allTags = TouristRepository.getAllTags();
         model.addAttribute("descriptions", allTowns);
         model.addAttribute("tags", allTags);
