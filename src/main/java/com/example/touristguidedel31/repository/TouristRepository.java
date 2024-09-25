@@ -1,6 +1,5 @@
 package com.example.touristguidedel31.repository;
 
-import com.example.touristguidedel31.controller.TouristController;
 import org.springframework.stereotype.Repository;
 import com.example.touristguidedel31.model.TouristAttraction;
 
