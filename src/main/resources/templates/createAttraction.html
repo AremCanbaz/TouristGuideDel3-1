@@ -29,14 +29,14 @@
 
     <!-- Town Dropdown -->
     <div class="mb-3">
-      <label for="description" class="form-label">By:</label>
-      <select id="description" name="description" class="form-select" required>
-        <option th:each="desc : ${descriptions}" th:value="${desc}" th:text="${desc}">Vælg en by</option>
+      <label for="district" class="form-label">By:</label>
+      <select id="district" name="district" class="form-select" required>
+        <option th:each="dist : ${district}" th:value="${dist}" th:text="${disc}">Vælg en by</option>
       </select>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Vælg Tags:</label>
+      <label name="tags" class="form-label">Vælg Tags:</label>
       <div th:each="tag : ${tags}" class="form-check">
         <input class="form-check-input" type="checkbox" name="tags" th:value="${tag}" id="tag-[[${tag}]]">
         <label class="form-check-label" for="tag-[[${tag}]]" th:text="${tag}"></label>

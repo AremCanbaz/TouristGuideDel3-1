@@ -30,23 +30,23 @@ public class TouristController {
 
     @GetMapping("/createAttraction")
     public String createAttraction(Model model) {
-        Set<String> allTowns = TouristRepository.getAllDistricts(); // Brug instansen af touristRepository
-        Set<String> allTags = TouristRepository.getAllTags();
-        model.addAttribute("descriptions", allTowns);
+        Set<String> allTowns = touristService.getAllDistricts(); // Brug instansen af touristRepository
+        Set<String> allTags = touristService.getAllTags();
+        model.addAttribute("district", allTowns);
         model.addAttribute("tags", allTags);
         return "createAttraction"; // Returner view-navnet
     }
 
     @PostMapping("/addAttraction")
-    public String addAttraction(@RequestParam("navn") String name,
-                                @RequestParam("beskrivelse") String description,
-                                @RequestParam("description") List<String> town,
+    public String addAttraction(@RequestParam("name") String name,
+                                @RequestParam("description") String description,
+                                @RequestParam("districts") String district,
                                 @RequestParam("tags") List<String> tags) {
         // Opret en ny attraktion baseret på formularens data
-        TouristAttraction newAttraction = new TouristAttraction(name,description,town,tags);
+        TouristAttraction newAttraction = new TouristAttraction(name,description,district,tags);
         newAttraction.setName(name);
         newAttraction.setDescription(description);
-        newAttraction.setDistrict(town);
+        newAttraction.setDistrict(district);
         newAttraction.setTags(tags); // Sæt de valgte tags
 
         // Gem attraktionen ved hjælp af touristService
@@ -66,8 +66,8 @@ public class TouristController {
     @GetMapping("/update/{name}")
     public String updateAttraction(@PathVariable String name, Model model) {
         TouristAttraction attraction = touristService.getAttractionByName(name);
-        Set<String> allTags = TouristService.getAllTags();
-        Set<String> allDistricts = TouristService.getAllDistricts();
+        Set<String> allTags = touristService.getAllTags();
+        Set<String> allDistricts = touristService.getAllDistricts();
         model.addAttribute("allTags", allTags);
         model.addAttribute("allTowns", allDistricts);
         model.addAttribute("attraction", attraction);
