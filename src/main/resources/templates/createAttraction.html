@@ -17,21 +17,21 @@
 
     <!-- Name Field -->
     <div class="mb-3">
-      <label for="navn" class="form-label">Navn:</label>
-      <input type="text" id="navn" name="navn" class="form-control" required />
+      <label for="name" class="form-label">Navn:</label>
+      <input type="text" id="name" name="name" class="form-control" required />
     </div>
 
     <!-- Description Field -->
     <div class="mb-3">
-      <label for="beskrivelse" class="form-label">Beskrivelse:</label>
-      <textarea id="beskrivelse" name="beskrivelse" class="form-control" rows="4" required></textarea>
+      <label for="description" class="form-label">Beskrivelse:</label>
+      <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
     </div>
 
     <!-- Town Dropdown -->
     <div class="mb-3">
       <label for="district" class="form-label">By:</label>
       <select id="district" name="district" class="form-select" required>
-        <option th:each="dist : ${district}" th:value="${dist}" th:text="${disc}">Vælg en by</option>
+        <option th:each="dist : ${district}" th:value="${dist}" th:text="${dist}">Vælg en by</option>
       </select>
     </div>
 

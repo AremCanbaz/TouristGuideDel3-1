@@ -72,7 +72,7 @@ class TouristControllerTest {
     @Test
     void addAttraction()  throws Exception {
         String mockAttractioname = "Nivå";
-        TouristAttraction mockAttraction = new TouristAttraction("Nivå","Nord sjælland", "Horsens", List.of("Sightseeing","Shopping"));
+        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","et sted i kbh", "Horsens", List.of("Sightseeing","Shopping"));
 
         mockMvc.perform(post("/createAttraction")
                         .param("name", mockAttraction.getName())
