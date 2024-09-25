@@ -48,6 +48,8 @@ class TouristControllerTest {
 
     }
 
+
+    // Jeg ved ikke hvorfor den her bliver ved med at fejle...
     @Test
     void createAttraction() throws Exception {
         Set<String> mockTags = Set.of("Family", "Shopping", "Sightseeing");
@@ -67,14 +69,42 @@ class TouristControllerTest {
 
     @Test
     void addAttraction() {
+
     }
 
     @Test
-    void showAttractionDetails() {
+    void showAttractionDetails() throws Exception {
+        String mockAttractionname = "Tivoli";
+        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","Et sted i kbh", List.of("Vesterbro") ,List.of("Family", "Entertainment"));
+        given(touristService.getAttractionByName(mockAttractionname)).willReturn(mockAttraction);
+
+        mockMvc.perform(get("/tags/{name}", mockAttractionname))
+                .andExpect(status().isOk())
+                .andExpect(view().name("tags"))
+                .andExpect(model().attribute("attraction",mockAttraction));
+
     }
 
     @Test
-    void updateAttraction() {
+    void updateAttraction() throws Exception {
+        String attractionName = "Tivoli";
+        TouristAttraction mockAttraction = new TouristAttraction(attractionName, "Amusement park in Copenhagen", List.of("Vesterbro"), List.of("Family", "Entertainment"));
+
+        Set<String> mockTags = Set.of("Family", "Shopping", "Sightseeing");
+        Set<String> mockDistricts = Set.of("Vesterbro", "Østerbro", "Horsens");
+
+        // Stub metoderne for at returnere mock data
+        given(touristService.getAttractionByName(attractionName)).willReturn(mockAttraction);
+        given(TouristService.getAllTags()).willReturn(mockTags);
+        given(TouristService.getAllDistricts()).willReturn(mockDistricts);
+
+        // Simuler GET-anmodning til den rigtige URL
+        mockMvc.perform(get("/update/{name}", attractionName)) // Brug den korrekte URL-sti
+                .andExpect(status().isOk()) // Forvent HTTP 200 OK
+                .andExpect(view().name("update-attraction")) // Forvent at view-navnet er update-attraction
+                .andExpect(model().attribute("allTags", mockTags)) // Forvent at modellen indeholder allTags
+                .andExpect(model().attribute("allTowns", mockDistricts)) // Forvent at modellen indeholder allTowns
+                .andExpect(model().attribute("attraction", mockAttraction)); // Forvent at modellen indeholder mockAttraction
     }
 
     @Test
