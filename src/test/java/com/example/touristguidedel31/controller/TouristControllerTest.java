@@ -13,12 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @WebMvcTest(TouristController.class)
@@ -108,11 +106,34 @@ class TouristControllerTest {
     }
 
     @Test
-    void testUpdateAttraction() {
+    void testUpdateAttraction() throws Exception {
+        TouristAttraction mockAttraction = new TouristAttraction("Tivoli", "Amusement park in Copenhagen", List.of("Vesterbro"), List.of("Family", "Entertainment"));
+
+        // Simuler POST-anmodning til update-attraction
+        mockMvc.perform(post("/update")
+                        .param("name", mockAttraction.getName())
+                        .param("description", mockAttraction.getDescription())
+                        .param("locations", String.join(",", mockAttraction.getDistrict()))
+                        .param("tags", String.join(",", mockAttraction.getTags())))
+                .andExpect(status().is3xxRedirection()) // Forvent en 3xx omdirigering
+                .andExpect(redirectedUrl("/")); // Forvent at omdirigere til root URL
+
+        // Bekræft at touristService.updateAttraction blev kaldt med den rigtige attraktion
+        verify(touristRepository).updateAttraction(mockAttraction);
     }
 
     @Test
-    void deleteAttraction() {
+    void deleteAttraction() throws Exception {
+        // Opret et navn for attraktionen, der skal slettes
+        String attractionName = "Tivoli";
+
+        // Simuler POST-anmodning til delete-attraction
+        mockMvc.perform(post("/delete/{name}", attractionName))
+                .andExpect(status().is3xxRedirection()) // Forvent en 3xx omdirigering
+                .andExpect(redirectedUrl("/")); // Forvent at omdirigere til root URL
+
+        // Bekræft at touristService.deleteAttraction blev kaldt med det rigtige navn
+        verify(touristService).deleteAttraction(attractionName);
     }
 
 }

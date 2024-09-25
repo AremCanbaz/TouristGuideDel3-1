@@ -59,16 +59,15 @@ public class TouristRepository {
         attractions.add(attraction);
     }
     // update
-    public TouristAttraction updateAttraction(TouristAttraction updatedAttraction) {
+    public void updateAttraction(TouristAttraction updatedAttraction) {
         for (int i = 0; i < attractions.size(); i++) {
             TouristAttraction currentAttraction = attractions.get(i);
             if (currentAttraction.getName().equals(updatedAttraction.getName())) {
                 attractions.set(i, updatedAttraction); // Erstat gammel attraktion med opdateret attraktion
-                return updatedAttraction;
+                return;
             }
 
         }
-        return null; // Returnér null hvis attraktionen ikke findes
     }
 
 
