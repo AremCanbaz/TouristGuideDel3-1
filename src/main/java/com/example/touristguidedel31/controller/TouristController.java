@@ -14,7 +14,6 @@ import java.util.Set;
 @Controller
 public class TouristController {
 
-    @Autowired
     private TouristRepository touristRepository;
 
     private final TouristService touristService;
