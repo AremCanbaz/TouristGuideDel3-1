@@ -54,8 +54,8 @@ class TouristControllerTest {
         Set<String> mockTowns = Set.of("Vesterbro", "Østerbro", "Horsens");
 
         // Mock opførsel af repository-metoderne
-        given(TouristRepository.getAllDistrict()).willReturn(mockTowns);
-        given(TouristRepository.getAllTags()).willReturn(mockTags);
+        given(TouristService.getAllDistricts()).willReturn(mockTowns);
+        given(TouristService.getAllTags()).willReturn(mockTags);
 
         // Simuler GET-anmodning til /createAttraction
         mockMvc.perform(get("/createAttraction"))
