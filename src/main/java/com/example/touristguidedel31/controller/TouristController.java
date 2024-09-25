@@ -19,7 +19,7 @@ public class TouristController {
 
     private final TouristService touristService;
 
-    //@Autowired
+    @Autowired
     public TouristController(TouristService touristService, TouristRepository touristRepository) {
         this.touristService = touristService;
         this.touristRepository = touristRepository;

@@ -9,7 +9,6 @@ import java.util.*;
 
 @Repository
 public class TouristRepository {
-    public TouristController touristController;
 
     private static final List<TouristAttraction> attractions = new ArrayList<>();
     private static final ArrayList<String> cityNames = new ArrayList<>(Arrays.asList("København", "Aarhus", "Odense", "Aalborg", "Esbjerg", "Randers", "Kolding", "Horsens", "Vejle", "Roskilde"));
