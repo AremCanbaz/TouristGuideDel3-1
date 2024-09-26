@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.example.touristguidedel31.model.TouristAttraction;
-import com.example.touristguidedel31.repository.*;
 import com.example.touristguidedel31.service.*;
 
 import java.util.List;
@@ -17,7 +16,7 @@ public class TouristController {
     private final TouristService touristService;
 
     @Autowired
-    public TouristController(TouristService touristService, TouristRepository touristRepository) {
+    public TouristController(TouristService touristService) {
         this.touristService = touristService;
     }
 
@@ -42,7 +41,7 @@ public class TouristController {
                                 @RequestParam("description") String description,
                                 @RequestParam("district") String district,
                                 @RequestParam("tags") List<String> tags) {
-        // Opret en ny attraktion baseret på formularens data
+        // Opret en ny attraktion BASERET PÅ HTML
         TouristAttraction newAttraction = new TouristAttraction(name,description,district,tags);
         newAttraction.setName(name);
         newAttraction.setDescription(description);
@@ -52,7 +51,6 @@ public class TouristController {
         // Gem attraktionen ved hjælp af touristService
         touristService.addAttraction(newAttraction);
 
-        // Redirect til en side, f.eks. listen over attraktioner
         return "redirect:/"; // Redirect til listen over attraktioner
     }
     @GetMapping("/tags/{name}")
