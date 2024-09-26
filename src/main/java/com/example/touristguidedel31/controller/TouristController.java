@@ -40,7 +40,7 @@ public class TouristController {
     @PostMapping("/addAttraction")
     public String addAttraction(@RequestParam("name") String name,
                                 @RequestParam("description") String description,
-                                @RequestParam("districts") String district,
+                                @RequestParam("district") String district,
                                 @RequestParam("tags") List<String> tags) {
         // Opret en ny attraktion baseret på formularens data
         TouristAttraction newAttraction = new TouristAttraction(name,description,district,tags);

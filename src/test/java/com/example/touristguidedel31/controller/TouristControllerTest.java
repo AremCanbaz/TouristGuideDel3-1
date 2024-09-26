@@ -74,7 +74,7 @@ class TouristControllerTest {
         String mockAttractioname = "Nivå";
         TouristAttraction mockAttraction = new TouristAttraction("Tivoli","et sted i kbh", "Horsens", List.of("Sightseeing","Shopping"));
 
-        mockMvc.perform(post("/createAttraction")
+        mockMvc.perform(post("/addAttraction")
                         .param("name", mockAttraction.getName())
                         .param("description", mockAttraction.getDescription())
                         .param("district", mockAttraction.getDistrict())
