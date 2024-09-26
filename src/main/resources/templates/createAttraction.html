@@ -17,26 +17,26 @@
 
     <!-- Name Field -->
     <div class="mb-3">
-      <label for="navn" class="form-label">Navn:</label>
-      <input type="text" id="navn" name="navn" class="form-control" required />
+      <label for="name" class="form-label">Navn:</label>
+      <input type="text" id="name" name="name" class="form-control" required />
     </div>
 
     <!-- Description Field -->
     <div class="mb-3">
-      <label for="beskrivelse" class="form-label">Beskrivelse:</label>
-      <textarea id="beskrivelse" name="beskrivelse" class="form-control" rows="4" required></textarea>
+      <label for="description" class="form-label">Beskrivelse:</label>
+      <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
     </div>
 
     <!-- Town Dropdown -->
     <div class="mb-3">
-      <label for="description" class="form-label">By:</label>
-      <select id="description" name="description" class="form-select" required>
-        <option th:each="desc : ${descriptions}" th:value="${desc}" th:text="${desc}">Vælg en by</option>
+      <label for="district" class="form-label">By:</label>
+      <select id="district" name="district" class="form-select" required>
+        <option th:each="dist : ${district}" th:value="${dist}" th:text="${dist}">Vælg en by</option>
       </select>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Vælg Tags:</label>
+      <label name="tags" class="form-label">Vælg Tags:</label>
       <div th:each="tag : ${tags}" class="form-check">
         <input class="form-check-input" type="checkbox" name="tags" th:value="${tag}" id="tag-[[${tag}]]">
         <label class="form-check-label" for="tag-[[${tag}]]" th:text="${tag}"></label>

@@ -27,7 +27,7 @@
             <tr th:each="attraction : ${attractions}">
                 <td th:text="${attraction.name}">Attraktion navn</td>
                 <td th:text="${attraction.description}">Attraktion beskrivelse</td>
-                <td th:text="${attraction.getDistrict()[0]}">Attraktion by</td>
+                <td th:text="${attraction.getDistrict()}">Attraktion by</td>
                 <td>
                     <ul class="list-unstyled">
                         <li th:each="tag : ${attraction.tags}" th:text="${tag}"></li>

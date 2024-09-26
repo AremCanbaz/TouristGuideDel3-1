@@ -5,22 +5,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.touristguidedel31.repository.TouristRepository;
 
-
-
 import java.util.*;
 
 @Service
 public class TouristService {
 
-    private static TouristRepository touristRepository = new TouristRepository();
+    private final TouristRepository touristRepository;
 
     @Autowired
     public TouristService(TouristRepository touristRepository) {
-        TouristService.touristRepository = touristRepository;
+        this.touristRepository = touristRepository;
     }
 
-    public static Set<String> getAllTags() {
-        return TouristRepository.getAllTags();
+    public Set<String> getAllTags() {
+        return touristRepository.getAllTags();
     }
 
     // Get all attractions
@@ -28,8 +26,8 @@ public class TouristService {
         return touristRepository.getAllAttractions();
     }
 
-    public static Set<String> getAllDistricts() {
-        return TouristRepository.getAllDistrict();
+    public Set<String> getAllDistricts() {
+        return touristRepository.getAllDistricts();
     }
 
     // Get an attraction by name
@@ -52,10 +50,6 @@ public class TouristService {
         touristRepository.deleteAttraction(name);
     }
 
-    public Set<String> getTags() {
-        return TouristRepository.getAllTags();
-
-    }
     public Set<String> getDescription() {
         return touristRepository.getAllDescription();
     }

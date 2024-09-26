@@ -1,14 +1,15 @@
 package com.example.touristguidedel31.model;
 
+import java.util.Collection;
 import java.util.List;
 
 public class TouristAttraction {
     private String name;
     private String description;
-    private List<String> district;
+    private String district;
     private List<String> tags;
 
-    public TouristAttraction(String name, String description, List<String> district, List<String> tags) {
+    public TouristAttraction(String name, String description, String district, List<String> tags) {
         this.name = name;
         this.description = description;
         this.district = district;
@@ -35,10 +36,10 @@ public class TouristAttraction {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
-    public List<String> getDistrict() {
+    public  String getDistrict() {
         return district;
     }
-    public void setDistrict(List<String> district) {
+    public void setDistrict(String district) {
         this.district = district;
     }
 }
