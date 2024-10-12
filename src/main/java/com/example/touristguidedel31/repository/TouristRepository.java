@@ -1,13 +1,21 @@
 package com.example.touristguidedel31.repository;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import com.example.touristguidedel31.model.TouristAttraction;
 
 
+import java.sql.*;
 import java.util.*;
 
 @Repository
 public class TouristRepository {
+    @Value("jdbc:mysql://touristguide3-1.mysql.database.azure.com:3306/tourist")
+    private String databaseURL;
+    @Value("AC25")
+    private String username;
+    @Value("Konto2500!")
+    private String password;
 
     private final List<TouristAttraction> attractions = new ArrayList<>();
     private final ArrayList<String> cityNames = new ArrayList<>(Arrays.asList("København", "Aarhus", "Odense", "Aalborg", "Esbjerg", "Randers", "Kolding", "Horsens", "Vejle", "Roskilde"));
@@ -20,9 +28,24 @@ public class TouristRepository {
         attractions.add(new TouristAttraction("Strøget", "Popular shopping street", "København H" ,List.of("Shopping", "Sightseeing")));
     }
     public Set<String> getAllTags() {
+        String sql = "SELECT TagName FROM touristtags";
         Set<String> tags = new HashSet<>();
-        for (TouristAttraction attraction : attractions) {
-            tags.addAll(attraction.getTags());  // Tilføj tags til sættet
+
+        // Kontrollér databaseforbindelsen
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            // Håndter ResultSet
+            while (resultSet.next()) {
+                String tag = resultSet.getString("TagName"); // Bruger kolonnenavnet
+                if (tag != null) { // Tjek for null-værdier
+                    tags.add(tag);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace(); // For mere detaljeret fejlinformation
         }
         return tags;
     }
