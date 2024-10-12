@@ -51,12 +51,22 @@ public class TouristRepository {
     }
     public Set<String> getAllDistricts() {
         Set<String> district = new HashSet<>();
-        for (TouristAttraction attraction : attractions) {
-            district.add(attraction.getDistrict());
+        String sql = "SELECT District FROM touristattraktioner";
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()){
+                String district1 = resultSet.getString("District");
+                if (district1 != null) {
+                    district.add(district1);
+                }
+            }
+
+            }catch (SQLException e){
+            System.err.println("Database error: " + e.getMessage());
         }
-        district.addAll(cityNames);
-        return district;
-    }
+            return district;
+        }
     public Set<String> getAllDescription() {
         Set<String> descriptions = new HashSet<>();
         for (TouristAttraction attraction : attractions) {
