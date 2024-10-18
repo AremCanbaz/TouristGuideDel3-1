@@ -21,11 +21,30 @@ public class TouristRepository {
     private final ArrayList<String> cityNames = new ArrayList<>(Arrays.asList("København", "Aarhus", "Odense", "Aalborg", "Esbjerg", "Randers", "Kolding", "Horsens", "Vejle", "Roskilde"));
 
 
-    public TouristRepository(){
-        attractions.add(new TouristAttraction("Tivoli", "Amusement park in Copenhagen", "Vesterbro" ,List.of("Family", "Entertainment")));
-        attractions.add(new TouristAttraction("Nyhavn", "Historic harbor in Copenhagen", "København H" ,List.of("History", "Food", "Shopping")));
-        attractions.add(new TouristAttraction("Statens Museum for Kunst", "Modern art museum", "Østerbro" ,List.of("Art", "Culture")));
-        attractions.add(new TouristAttraction("Strøget", "Popular shopping street", "København H" ,List.of("Shopping", "Sightseeing")));
+    public void touristRepository() {
+        String sql = "SELECT ta.Name, ta.Description, ta.District, tt.TagName\n" +
+                "FROM touristattraktioner ta\n" +
+                "JOIN attractiontags at ON ta.id = at.AttractionID\n" +
+                "JOIN touristtags tt ON tt.TagID = at.TagID;";
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                String tagName = resultSet.getString("tagName");
+                List<String> tagNames = Arrays.asList(tagName.split(","));
+                attractions.add(new TouristAttraction(
+                        resultSet.getString("Name"),
+                        resultSet.getString("Description"),
+                        resultSet.getString("District"),
+                        tagNames
+                ));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     public Set<String> getAllTags() {
         String sql = "SELECT TagName FROM touristtags";
@@ -76,7 +95,8 @@ public class TouristRepository {
     }
 
     // manipulate list
-    public List<TouristAttraction> getAllAttractions() {
+    public ArrayList<TouristAttraction> getAllAttractions() {
+        touristRepository();
         return new ArrayList<>(attractions);
     }
 
