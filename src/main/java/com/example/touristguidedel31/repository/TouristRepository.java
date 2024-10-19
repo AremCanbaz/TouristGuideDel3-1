@@ -74,7 +74,7 @@ public class TouristRepository {
         return touristAttractionsSet;
     }
     public Set<String> getAllTags() {
-        String sql = "SELECT TagName FROM touristtags";
+        String sql = "SELECT tag FROM Tags";
         Set<String> tags = new HashSet<>();
 
         // Kontrollér databaseforbindelsen
@@ -84,7 +84,7 @@ public class TouristRepository {
 
             // Håndter ResultSet
             while (resultSet.next()) {
-                String tag = resultSet.getString("TagName"); // Bruger kolonnenavnet
+                String tag = resultSet.getString("tag"); // Bruger kolonnenavnet
                 if (tag != null) { // Tjek for null-værdier
                     tags.add(tag);
                 }
@@ -97,12 +97,12 @@ public class TouristRepository {
     }
     public Set<String> getAllDistricts() {
         Set<String> district = new HashSet<>();
-        String sql = "SELECT District FROM touristattraktioner";
+        String sql = "SELECT bynavn FROM cities";
         try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()){
-                String district1 = resultSet.getString("District");
+                String district1 = resultSet.getString("bynavn");
                 if (district1 != null) {
                     district.add(district1);
                 }
