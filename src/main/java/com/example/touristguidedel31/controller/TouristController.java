@@ -22,8 +22,8 @@ public class TouristController {
 
     @GetMapping()
     public String showAttractions(Model model) {
-        List<TouristAttraction> attractions = touristService.getAllAttractions();
-        model.addAttribute("attractions", attractions);
+        Set<TouristAttraction> touristAttractionSet = touristService.getAllAttractionSet();
+        model.addAttribute("attractions", touristAttractionSet);
         return "attractionsList";
     }
 
@@ -40,7 +40,7 @@ public class TouristController {
     public String addAttraction(@RequestParam("name") String name,
                                 @RequestParam("description") String description,
                                 @RequestParam("district") String district,
-                                @RequestParam("tags") List<String> tags) {
+                                @RequestParam("tags") Set<String> tags) {
         // Opret en ny attraktion BASERET PÅ HTML
         TouristAttraction newAttraction = new TouristAttraction(name,description,district,tags);
         newAttraction.setName(name);

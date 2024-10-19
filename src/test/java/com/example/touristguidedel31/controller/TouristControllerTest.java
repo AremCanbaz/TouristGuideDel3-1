@@ -35,9 +35,9 @@ class TouristControllerTest {
 
     @Test
     void showAttractions() throws Exception {
-        List<TouristAttraction> mockAttractions = List.of(
-                new TouristAttraction("Tivoli", "Amusement park in Copenhagen", "Vesterbro" ,List.of("Family", "Entertainment")));
-        new TouristAttraction("Statens Museum for Kunst", "Modern art museum", "Østerbro" ,List.of("Art", "Culture"));
+        Set<TouristAttraction> mockAttractions = Set.of(
+                new TouristAttraction("Tivoli", "Amusement park in Copenhagen", "Vesterbro" ,Set.of("Family", "Entertainment")));
+        new TouristAttraction("Statens Museum for Kunst", "Modern art museum", "Østerbro" ,Set.of("Art", "Culture"));
 
         given(touristService.getAllAttractions()).willReturn(mockAttractions);
 
@@ -72,7 +72,7 @@ class TouristControllerTest {
     @Test
     void addAttraction()  throws Exception {
         String mockAttractioname = "Nivå";
-        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","et sted i kbh", "Horsens", List.of("Sightseeing","Shopping"));
+        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","et sted i kbh", "Horsens", Set.of("Sightseeing","Shopping"));
 
         mockMvc.perform(post("/addAttraction")
                         .param("name", mockAttraction.getName())
@@ -90,7 +90,7 @@ class TouristControllerTest {
     @Test
     void showAttractionDetails() throws Exception {
         String mockAttractionname = "Tivoli";
-        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","Et sted i kbh", "Vesterbro" ,List.of("Family", "Entertainment"));
+        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","Et sted i kbh", "Vesterbro" ,Set.of("Family", "Entertainment"));
         given(touristService.getAttractionByName(mockAttractionname)).willReturn(mockAttraction);
 
         mockMvc.perform(get("/tags/{name}", mockAttractionname))
@@ -103,7 +103,7 @@ class TouristControllerTest {
     @Test
     void updateAttraction() throws Exception {
         String attractionName = "Tivoli";
-        TouristAttraction mockAttraction = new TouristAttraction(attractionName, "Amusement park in Copenhagen", "Vesterbro", List.of("Family", "Entertainment"));
+        TouristAttraction mockAttraction = new TouristAttraction(attractionName, "Amusement park in Copenhagen", "Vesterbro", Set.of("Family", "Entertainment"));
 
         Set<String> mockTags = Set.of("Family", "Shopping", "Sightseeing");
         Set<String> mockDistricts = Set.of("Vesterbro", "Østerbro", "Horsens");
@@ -125,7 +125,7 @@ class TouristControllerTest {
 
     @Test
     void testUpdateAttraction() throws Exception {
-        TouristAttraction mockAttraction = new TouristAttraction("Kongens Have", "et sted i kbh", "Herlev", List.of("Family", "Entertainment"));
+        TouristAttraction mockAttraction = new TouristAttraction("Kongens Have", "et sted i kbh", "Herlev", Set.of("Family", "Entertainment"));
 
         // Simuler POST-anmodning til update-attraction
         mockMvc.perform(post("/update")

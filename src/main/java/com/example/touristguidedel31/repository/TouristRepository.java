@@ -1,10 +1,12 @@
 package com.example.touristguidedel31.repository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import com.example.touristguidedel31.model.TouristAttraction;
 
 
+import javax.naming.Name;
 import java.sql.*;
 import java.util.*;
 
@@ -18,33 +20,58 @@ public class TouristRepository {
     private String password;
 
     private final List<TouristAttraction> attractions = new ArrayList<>();
-    private final ArrayList<String> cityNames = new ArrayList<>(Arrays.asList("København", "Aarhus", "Odense", "Aalborg", "Esbjerg", "Randers", "Kolding", "Horsens", "Vejle", "Roskilde"));
 
 
     public void touristRepository() {
-        String sql = "SELECT ta.Name, ta.Description, ta.District, tt.TagName\n" +
-                "FROM touristattraktioner ta\n" +
-                "JOIN attractiontags at ON ta.id = at.AttractionID\n" +
+        String sql = "SELECT ta.Name, ta.Description, ta.District, tt.TagName " +
+                "FROM touristattraktioner ta " +
+                "JOIN attractiontags at ON ta.id = at.AttractionID " +
                 "JOIN touristtags tt ON tt.TagID = at.TagID;";
         try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(sql);
 
+            // Brug en HashMap til at sikre, at vi ikke opretter duplikationer af attraktioner
+            Map<String, TouristAttraction> attractionMap = new HashMap<>();
+
             while (resultSet.next()) {
-                String tagName = resultSet.getString("tagName");
-                List<String> tagNames = Arrays.asList(tagName.split(","));
-                attractions.add(new TouristAttraction(
-                        resultSet.getString("Name"),
-                        resultSet.getString("Description"),
-                        resultSet.getString("District"),
-                        tagNames
-                ));
+                String name = resultSet.getString("Name");
+                String description = resultSet.getString("Description");
+                String district = resultSet.getString("District");
+                String tagName = resultSet.getString("TagName");
+
+                // Nøgle for at identificere unikke attraktioner (name + district)
+                String key = name + district;
+
+                // Hvis attraktionen allerede findes i mappen
+                if (attractionMap.containsKey(key)) {
+                    TouristAttraction existingAttraction = attractionMap.get(key);
+                    // Tilføj det nye tag til den eksisterende attraktion
+                    existingAttraction.getTags().add(tagName);
+                } else {
+                    // Opret en ny attraktion og tilføj det første tag
+                    Set<String> tags = new HashSet<>();
+                    tags.add(tagName);
+
+                    TouristAttraction newAttraction = new TouristAttraction(name, description, district, tags);
+                    attractionMap.put(key, newAttraction);
+                }
             }
+
+            // Ryd listen for attraktioner og tilføj kun unikke attraktioner
+            attractions.clear();
+            attractions.addAll(attractionMap.values());
 
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    public Set<TouristAttraction> getAttractionsSet() {
+        touristRepository();
+        Set<TouristAttraction> touristAttractionsSet = new HashSet<>();
+        touristAttractionsSet.addAll(attractions);
+        return touristAttractionsSet;
     }
     public Set<String> getAllTags() {
         String sql = "SELECT TagName FROM touristtags";
