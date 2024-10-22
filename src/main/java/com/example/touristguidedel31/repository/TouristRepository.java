@@ -113,6 +113,32 @@ public class TouristRepository {
         }
             return district;
         }
+    public void addAttraction(TouristAttraction attraction) {
+        ResultSet generatedKeys = null;
+        try(Connection connection = DriverManager.getConnection(databaseURL,username,password)){
+            String attraktionsql = "INSERT INTO insert into touristattraktioner (Name,Description,District) VALUES (?,?,?)";
+            PreparedStatement pstmt = connection.prepareStatement(attraktionsql);
+            pstmt.setString(1,attraction.getName());
+            pstmt.setString(2,attraction.getDescription());
+            pstmt.setString(3,attraction.getDistrict());
+            pstmt.executeUpdate();
+
+            generatedKeys = pstmt.getGeneratedKeys();
+            int attraktionId = 0;
+            if (generatedKeys.next()) {
+                attraktionId = generatedKeys.getInt(0);
+                System.out.println(attraktionId);
+            }
+            String tagsSql = "select id from tags where tag= ?";
+            PreparedStatement tagsStmt = connection.prepareStatement(tagsSql);
+            ResultSet rs = tagsStmt.executeQuery();
+            String keysSql = "insert into attractiontags(AttractionID,TagID) values(?,?)";
+        }
+        catch (SQLException e){
+            System.err.println("Database error: " + e.getMessage());
+        }
+    }
+
     public Set<String> getAllDescription() {
         Set<String> descriptions = new HashSet<>();
         for (TouristAttraction attraction : attractions) {
@@ -122,10 +148,6 @@ public class TouristRepository {
     }
 
     // manipulate list
-    public ArrayList<TouristAttraction> getAllAttractions() {
-        touristRepository();
-        return new ArrayList<>(attractions);
-    }
 
 
     public TouristAttraction getAttractionByName(String name) {
@@ -133,10 +155,6 @@ public class TouristRepository {
                 .filter(attraction -> attraction.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
-    }
-
-    public void addAttraction(TouristAttraction attraction) {
-        attractions.add(attraction);
     }
     // update
     public TouristAttraction updateAttraction(TouristAttraction updatedAttraction) {
