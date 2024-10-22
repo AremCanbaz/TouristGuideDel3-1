@@ -1,12 +1,10 @@
 package com.example.touristguidedel31.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import com.example.touristguidedel31.model.TouristAttraction;
 
 
-import javax.naming.Name;
 import java.sql.*;
 import java.util.*;
 
@@ -114,30 +112,69 @@ public class TouristRepository {
             return district;
         }
     public void addAttraction(TouristAttraction attraction) {
-        ResultSet generatedKeys = null;
-        try(Connection connection = DriverManager.getConnection(databaseURL,username,password)){
-            String attraktionsql = "INSERT INTO insert into touristattraktioner (Name,Description,District) VALUES (?,?,?)";
-            PreparedStatement pstmt = connection.prepareStatement(attraktionsql);
-            pstmt.setString(1,attraction.getName());
-            pstmt.setString(2,attraction.getDescription());
-            pstmt.setString(3,attraction.getDistrict());
+        String attraktionsql = "INSERT INTO touristattraktioner (Name, Description, District) VALUES (?, ?, ?)";
+
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            // 1. Indsæt attraktion og hent genererede nøgler
+            PreparedStatement pstmt = connection.prepareStatement(attraktionsql, PreparedStatement.RETURN_GENERATED_KEYS);
+            pstmt.setString(1, attraction.getName());
+            pstmt.setString(2, attraction.getDescription());
+            pstmt.setString(3, attraction.getDistrict());
             pstmt.executeUpdate();
 
-            generatedKeys = pstmt.getGeneratedKeys();
+            // Hent det genererede attraktion-id
             int attraktionId = 0;
+            ResultSet generatedKeys = pstmt.getGeneratedKeys();
             if (generatedKeys.next()) {
-                attraktionId = generatedKeys.getInt(0);
-                System.out.println(attraktionId);
+                attraktionId = generatedKeys.getInt(1);
+                System.out.println("Genereret Attraktion ID: " + attraktionId);
+            } else {
+                throw new SQLException("Ingen genererede nøgler blev returneret.");
             }
-            String tagsSql = "select id from tags where tag= ?";
-            PreparedStatement tagsStmt = connection.prepareStatement(tagsSql);
-            ResultSet rs = tagsStmt.executeQuery();
-            String keysSql = "insert into attractiontags(AttractionID,TagID) values(?,?)";
-        }
-        catch (SQLException e){
+
+            // 2. Indsæt tags
+            String insertKeysstms = "INSERT INTO attractiontags (AttractionID, TagID) VALUES (?, ?)";
+            pstmt = connection.prepareStatement(insertKeysstms);
+
+            Set<String> tags = getAllTags();
+            for (String tag : tags) {
+                int tagId = getOrCreateTagId(tag, connection);
+                pstmt.setInt(1, attraktionId);
+                pstmt.setInt(2, tagId);
+                pstmt.executeUpdate(); // Udfør indsættelse for hver tag
+            }
+        } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
         }
     }
+
+    private int getOrCreateTagId(String tag, Connection conn) throws SQLException {
+        // 1. Check om tag eksisterer
+        String checkTagSql = "SELECT TagID FROM touristtags WHERE TagName = ?";
+        PreparedStatement checkStmt = conn.prepareStatement(checkTagSql);
+        checkStmt.setString(1, tag);
+        ResultSet rs = checkStmt.executeQuery();
+
+        if (rs.next()) {
+            // Hvis tag findes, returner dets id
+            return rs.getInt("TagID");
+        } else {
+            // 2. Hvis tag ikke findes, indsæt det og returner det nye id
+            String insertTagSql = "INSERT INTO touristtags (TagName) VALUES (?)";
+            PreparedStatement insertStmt = conn.prepareStatement(insertTagSql, PreparedStatement.RETURN_GENERATED_KEYS);
+            insertStmt.setString(1, tag);
+            insertStmt.executeUpdate();
+
+            ResultSet generatedKeys = insertStmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getInt(1);  // Returner det genererede tag-id
+            } else {
+                throw new SQLException("Fejl ved oprettelse af tag.");
+            }
+        }
+    }
+
+
 
     public Set<String> getAllDescription() {
         Set<String> descriptions = new HashSet<>();
