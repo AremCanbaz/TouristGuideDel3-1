@@ -136,7 +136,8 @@ public class TouristRepository {
             String insertKeysstms = "INSERT INTO attractiontags (AttractionID, TagID) VALUES (?, ?)";
             pstmt = connection.prepareStatement(insertKeysstms);
 
-            Set<String> tags = getAllTags();
+            // Brug tags fra attraction objektet
+            Set<String> tags = attraction.getTags();
             for (String tag : tags) {
                 int tagId = getOrCreateTagId(tag, connection);
                 pstmt.setInt(1, attraktionId);
@@ -147,6 +148,8 @@ public class TouristRepository {
             System.err.println("Database error: " + e.getMessage());
         }
     }
+
+
 
     private int getOrCreateTagId(String tag, Connection conn) throws SQLException {
         // 1. Check om tag eksisterer
