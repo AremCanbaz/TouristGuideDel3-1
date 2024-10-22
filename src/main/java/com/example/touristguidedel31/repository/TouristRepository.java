@@ -209,7 +209,33 @@ public class TouristRepository {
     }
 
     public void deleteAttraction(String name) {
+        // Korrekt SQL med kolonnenavn inkluderet
+        String deletesql = "DELETE FROM touristattraktioner WHERE Name = ?";
+
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deletesql);
+
+            // Bind parameteren 'name' til SQL-forespørgslen
+            preparedStatement.setString(1, name);
+
+            // Udfør DELETE-forespørgslen
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            // Log antallet af slettede rækker
+            if (rowsAffected > 0) {
+                System.out.println(rowsAffected + " attraction(s) deleted.");
+            } else {
+                System.out.println("No attraction found with the name: " + name);
+            }
+
+        } catch (SQLException e) {
+            // Håndter SQL-fejl og udskriv detaljer
+            System.err.println("Database error: " + e.getMessage());
+        }
+
+        // Fjern attraktionen fra listen 'attractions' lokalt
         attractions.removeIf(attraction -> attraction.getName().equalsIgnoreCase(name));
     }
+
 
 }
