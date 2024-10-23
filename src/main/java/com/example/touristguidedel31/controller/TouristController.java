@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import com.example.touristguidedel31.model.TouristAttraction;
 import com.example.touristguidedel31.service.*;
 
-import java.util.List;
 import java.util.Set;
 
 @Controller

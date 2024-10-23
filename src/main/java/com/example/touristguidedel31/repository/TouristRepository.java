@@ -121,7 +121,7 @@ public class TouristRepository {
             pstmt.executeUpdate();
 
             // Hent det genererede attraktion-id
-            int attraktionId = 0;
+            int attraktionId;
             ResultSet generatedKeys = pstmt.getGeneratedKeys();
             if (generatedKeys.next()) {
                 attraktionId = generatedKeys.getInt(1);
