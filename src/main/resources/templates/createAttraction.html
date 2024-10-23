@@ -6,6 +6,16 @@
   <title>Tilføj Turistattraktion</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .tags-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3 kolonner */
+      gap: 10px; /* Plads mellem checkboxes */
+    }
+    .form-check-inline {
+      width: auto; /* Gør det muligt at tilpasse bredde */
+    }
+  </style>
 </head>
 <body>
 
@@ -35,11 +45,14 @@
       </select>
     </div>
 
+    <!-- Tags Inline in Grid -->
     <div class="mb-3">
-      <label name="tags" class="form-label">Vælg Tags:</label>
-      <div th:each="tag : ${tags}" class="form-check">
-        <input class="form-check-input" type="checkbox" name="tags" th:value="${tag}" id="tag-[[${tag}]]">
-        <label class="form-check-label" for="tag-[[${tag}]]" th:text="${tag}"></label>
+      <label class="form-label">Vælg Tags:</label>
+      <div class="tags-container">
+        <div th:each="tag : ${tags}" class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" name="tags" th:value="${tag}" id="tag-[[${tag}]]">
+          <label class="form-check-label" for="tag-[[${tag}]]" th:text="${tag}"></label>
+        </div>
       </div>
     </div>
 

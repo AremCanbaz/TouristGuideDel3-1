@@ -10,11 +10,11 @@ import java.util.*;
 
 @Repository
 public class TouristRepository {
-    @Value("jdbc:mysql://touristguide3-1.mysql.database.azure.com:3306/tourist")
+    @Value("${spring.datasource.url}")
     private String databaseURL;
-    @Value("AC25")
+    @Value("${spring.datasource.username}")
     private String username;
-    @Value("Konto2500!")
+    @Value("${spring.datasource.password}")
     private String password;
 
     private final List<TouristAttraction> attractions = new ArrayList<>();
@@ -67,9 +67,7 @@ public class TouristRepository {
     }
     public Set<TouristAttraction> getAttractionsSet() {
         touristRepository();
-        Set<TouristAttraction> touristAttractionsSet = new HashSet<>();
-        touristAttractionsSet.addAll(attractions);
-        return touristAttractionsSet;
+        return new HashSet<>(attractions);
     }
     public Set<String> getAllTags() {
         String sql = "SELECT tag FROM Tags";
@@ -187,7 +185,6 @@ public class TouristRepository {
         return descriptions;
     }
 
-    // manipulate list
 
 
     public TouristAttraction getAttractionByName(String name) {
@@ -196,7 +193,7 @@ public class TouristRepository {
                 .findFirst()
                 .orElse(null);
     }
-    // update
+
     public TouristAttraction updateAttraction(TouristAttraction updatedAttraction) {
         for (int i = 0; i < attractions.size(); i++) {
             TouristAttraction currentAttraction = attractions.get(i);
@@ -219,14 +216,9 @@ public class TouristRepository {
             preparedStatement.setString(1, name);
 
             // Udfør DELETE-forespørgslen
-            int rowsAffected = preparedStatement.executeUpdate();
+           preparedStatement.executeUpdate();
 
             // Log antallet af slettede rækker
-            if (rowsAffected > 0) {
-                System.out.println(rowsAffected + " attraction(s) deleted.");
-            } else {
-                System.out.println("No attraction found with the name: " + name);
-            }
 
         } catch (SQLException e) {
             // Håndter SQL-fejl og udskriv detaljer

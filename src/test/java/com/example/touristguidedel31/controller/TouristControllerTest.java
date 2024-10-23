@@ -9,10 +9,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -35,19 +33,21 @@ class TouristControllerTest {
 
     @Test
     void showAttractions() throws Exception {
+        // Opretter mock-attractions
         Set<TouristAttraction> mockAttractions = Set.of(
-                new TouristAttraction("Tivoli", "Amusement park in Copenhagen", "Vesterbro" ,Set.of("Family", "Entertainment")));
-        new TouristAttraction("Statens Museum for Kunst", "Modern art museum", "Østerbro" ,Set.of("Art", "Culture"));
+                new TouristAttraction("Tivoli", "En populær forlystelsespark i København.", "København", Set.of("Kultur", "Underholdning")),
+                new TouristAttraction("Den Lille Havfrue", "En berømt statue beliggende i København.", "Østerbro", Set.of("Kultur", "Historie"))
+        );
 
-        given(touristService.getAllAttractions()).willReturn(mockAttractions);
+        // Mocking touristService's getAllAttractions til at returnere mockAttractions
+        given(touristService.getAllAttractionSet()).willReturn(mockAttractions);
 
-        mockMvc.perform(get(""))
-                .andExpect(status().isOk())
-                .andExpect(view().name("attractionsList"))
-                .andExpect(model().attribute("attractions", mockAttractions));
-
+        // Kør GET-request og verificer resultatet
+        mockMvc.perform(get("/")) // Sørg for at GET-routen stemmer overens med din controller
+                .andExpect(status().isOk())  // Forvent HTTP-status 200 (OK)
+                .andExpect(view().name("attractionsList"))  // Forvent at view-navnet er "attractionsList"
+                .andExpect(model().attribute("attractions", mockAttractions));  // Forvent at "attractions" indeholder mockAttractions
     }
-
 
     // Jeg ved ikke hvorfor den her bliver ved med at fejle...
     @Test
