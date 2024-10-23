@@ -9,10 +9,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -35,19 +33,21 @@ class TouristControllerTest {
 
     @Test
     void showAttractions() throws Exception {
-        List<TouristAttraction> mockAttractions = List.of(
-                new TouristAttraction("Tivoli", "Amusement park in Copenhagen", "Vesterbro" ,List.of("Family", "Entertainment")));
-        new TouristAttraction("Statens Museum for Kunst", "Modern art museum", "Østerbro" ,List.of("Art", "Culture"));
+        // Opretter mock-attractions
+        Set<TouristAttraction> mockAttractions = Set.of(
+                new TouristAttraction("Tivoli", "En populær forlystelsespark i København.", "København", Set.of("Kultur", "Underholdning")),
+                new TouristAttraction("Den Lille Havfrue", "En berømt statue beliggende i København.", "Østerbro", Set.of("Kultur", "Historie"))
+        );
 
-        given(touristService.getAllAttractions()).willReturn(mockAttractions);
+        // Mocking touristService's getAllAttractions til at returnere mockAttractions
+        given(touristService.getAllAttractionSet()).willReturn(mockAttractions);
 
-        mockMvc.perform(get(""))
-                .andExpect(status().isOk())
-                .andExpect(view().name("attractionsList"))
-                .andExpect(model().attribute("attractions", mockAttractions));
-
+        // Kør GET-request og verificer resultatet
+        mockMvc.perform(get("/")) // Sørg for at GET-routen stemmer overens med din controller
+                .andExpect(status().isOk())  // Forvent HTTP-status 200 (OK)
+                .andExpect(view().name("attractionsList"))  // Forvent at view-navnet er "attractionsList"
+                .andExpect(model().attribute("attractions", mockAttractions));  // Forvent at "attractions" indeholder mockAttractions
     }
-
 
     // Jeg ved ikke hvorfor den her bliver ved med at fejle...
     @Test
@@ -72,7 +72,7 @@ class TouristControllerTest {
     @Test
     void addAttraction()  throws Exception {
         String mockAttractioname = "Nivå";
-        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","et sted i kbh", "Horsens", List.of("Sightseeing","Shopping"));
+        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","et sted i kbh", "Horsens", Set.of("Sightseeing","Shopping"));
 
         mockMvc.perform(post("/addAttraction")
                         .param("name", mockAttraction.getName())
@@ -90,7 +90,7 @@ class TouristControllerTest {
     @Test
     void showAttractionDetails() throws Exception {
         String mockAttractionname = "Tivoli";
-        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","Et sted i kbh", "Vesterbro" ,List.of("Family", "Entertainment"));
+        TouristAttraction mockAttraction = new TouristAttraction("Tivoli","Et sted i kbh", "Vesterbro" ,Set.of("Family", "Entertainment"));
         given(touristService.getAttractionByName(mockAttractionname)).willReturn(mockAttraction);
 
         mockMvc.perform(get("/tags/{name}", mockAttractionname))
@@ -103,7 +103,7 @@ class TouristControllerTest {
     @Test
     void updateAttraction() throws Exception {
         String attractionName = "Tivoli";
-        TouristAttraction mockAttraction = new TouristAttraction(attractionName, "Amusement park in Copenhagen", "Vesterbro", List.of("Family", "Entertainment"));
+        TouristAttraction mockAttraction = new TouristAttraction(attractionName, "Amusement park in Copenhagen", "Vesterbro", Set.of("Family", "Entertainment"));
 
         Set<String> mockTags = Set.of("Family", "Shopping", "Sightseeing");
         Set<String> mockDistricts = Set.of("Vesterbro", "Østerbro", "Horsens");
@@ -125,7 +125,7 @@ class TouristControllerTest {
 
     @Test
     void testUpdateAttraction() throws Exception {
-        TouristAttraction mockAttraction = new TouristAttraction("Kongens Have", "et sted i kbh", "Herlev", List.of("Family", "Entertainment"));
+        TouristAttraction mockAttraction = new TouristAttraction("Kongens Have", "et sted i kbh", "Herlev", Set.of("Family", "Entertainment"));
 
         // Simuler POST-anmodning til update-attraction
         mockMvc.perform(post("/update")

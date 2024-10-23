@@ -1,39 +1,182 @@
 package com.example.touristguidedel31.repository;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import com.example.touristguidedel31.model.TouristAttraction;
 
 
+import java.sql.*;
 import java.util.*;
 
 @Repository
 public class TouristRepository {
+    @Value("${spring.datasource.url}")
+    private String databaseURL;
+    @Value("${spring.datasource.username}")
+    private String username;
+    @Value("${spring.datasource.password}")
+    private String password;
 
     private final List<TouristAttraction> attractions = new ArrayList<>();
-    private final ArrayList<String> cityNames = new ArrayList<>(Arrays.asList("København", "Aarhus", "Odense", "Aalborg", "Esbjerg", "Randers", "Kolding", "Horsens", "Vejle", "Roskilde"));
 
 
-    public TouristRepository(){
-        attractions.add(new TouristAttraction("Tivoli", "Amusement park in Copenhagen", "Vesterbro" ,List.of("Family", "Entertainment")));
-        attractions.add(new TouristAttraction("Nyhavn", "Historic harbor in Copenhagen", "København H" ,List.of("History", "Food", "Shopping")));
-        attractions.add(new TouristAttraction("Statens Museum for Kunst", "Modern art museum", "Østerbro" ,List.of("Art", "Culture")));
-        attractions.add(new TouristAttraction("Strøget", "Popular shopping street", "København H" ,List.of("Shopping", "Sightseeing")));
+    public void touristRepository() {
+        String sql = "SELECT ta.Name, ta.Description, ta.District, tt.TagName " +
+                "FROM touristattraktioner ta " +
+                "JOIN attractiontags at ON ta.id = at.AttractionID " +
+                "JOIN touristtags tt ON tt.TagID = at.TagID;";
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            // Brug en HashMap til at sikre, at vi ikke opretter duplikationer af attraktioner
+            Map<String, TouristAttraction> attractionMap = new HashMap<>();
+
+            while (resultSet.next()) {
+                String name = resultSet.getString("Name");
+                String description = resultSet.getString("Description");
+                String district = resultSet.getString("District");
+                String tagName = resultSet.getString("TagName");
+
+                // Nøgle for at identificere unikke attraktioner (name + district)
+                String key = name + district;
+
+                // Hvis attraktionen allerede findes i mappen
+                if (attractionMap.containsKey(key)) {
+                    TouristAttraction existingAttraction = attractionMap.get(key);
+                    // Tilføj det nye tag til den eksisterende attraktion
+                    existingAttraction.getTags().add(tagName);
+                } else {
+                    // Opret en ny attraktion og tilføj det første tag
+                    Set<String> tags = new HashSet<>();
+                    tags.add(tagName);
+
+                    TouristAttraction newAttraction = new TouristAttraction(name, description, district, tags);
+                    attractionMap.put(key, newAttraction);
+                }
+            }
+
+            // Ryd listen for attraktioner og tilføj kun unikke attraktioner
+            attractions.clear();
+            attractions.addAll(attractionMap.values());
+
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    public Set<TouristAttraction> getAttractionsSet() {
+        touristRepository();
+        return new HashSet<>(attractions);
     }
     public Set<String> getAllTags() {
+        String sql = "SELECT tag FROM Tags";
         Set<String> tags = new HashSet<>();
-        for (TouristAttraction attraction : attractions) {
-            tags.addAll(attraction.getTags());  // Tilføj tags til sættet
+
+        // Kontrollér databaseforbindelsen
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            // Håndter ResultSet
+            while (resultSet.next()) {
+                String tag = resultSet.getString("tag"); // Bruger kolonnenavnet
+                if (tag != null) { // Tjek for null-værdier
+                    tags.add(tag);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace(); // For mere detaljeret fejlinformation
         }
         return tags;
     }
     public Set<String> getAllDistricts() {
         Set<String> district = new HashSet<>();
-        for (TouristAttraction attraction : attractions) {
-            district.add(attraction.getDistrict());
+        String sql = "SELECT bynavn FROM cities";
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()){
+                String district1 = resultSet.getString("bynavn");
+                if (district1 != null) {
+                    district.add(district1);
+                }
+            }
+
+            }catch (SQLException e){
+            System.err.println("Database error: " + e.getMessage());
         }
-        district.addAll(cityNames);
-        return district;
+            return district;
+        }
+    public void addAttraction(TouristAttraction attraction) {
+        String attraktionsql = "INSERT INTO touristattraktioner (Name, Description, District) VALUES (?, ?, ?)";
+
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            // 1. Indsæt attraktion og hent genererede nøgler
+            PreparedStatement pstmt = connection.prepareStatement(attraktionsql, PreparedStatement.RETURN_GENERATED_KEYS);
+            pstmt.setString(1, attraction.getName());
+            pstmt.setString(2, attraction.getDescription());
+            pstmt.setString(3, attraction.getDistrict());
+            pstmt.executeUpdate();
+
+            // Hent det genererede attraktion-id
+            int attraktionId = 0;
+            ResultSet generatedKeys = pstmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                attraktionId = generatedKeys.getInt(1);
+                System.out.println("Genereret Attraktion ID: " + attraktionId);
+            } else {
+                throw new SQLException("Ingen genererede nøgler blev returneret.");
+            }
+
+            // 2. Indsæt tags
+            String insertKeysstms = "INSERT INTO attractiontags (AttractionID, TagID) VALUES (?, ?)";
+            pstmt = connection.prepareStatement(insertKeysstms);
+
+            // Brug tags fra attraction objektet
+            Set<String> tags = attraction.getTags();
+            for (String tag : tags) {
+                int tagId = getOrCreateTagId(tag, connection);
+                pstmt.setInt(1, attraktionId);
+                pstmt.setInt(2, tagId);
+                pstmt.executeUpdate(); // Udfør indsættelse for hver tag
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+        }
     }
+
+
+
+    private int getOrCreateTagId(String tag, Connection conn) throws SQLException {
+        // 1. Check om tag eksisterer
+        String checkTagSql = "SELECT TagID FROM touristtags WHERE TagName = ?";
+        PreparedStatement checkStmt = conn.prepareStatement(checkTagSql);
+        checkStmt.setString(1, tag);
+        ResultSet rs = checkStmt.executeQuery();
+
+        if (rs.next()) {
+            // Hvis tag findes, returner dets id
+            return rs.getInt("TagID");
+        } else {
+            // 2. Hvis tag ikke findes, indsæt det og returner det nye id
+            String insertTagSql = "INSERT INTO touristtags (TagName) VALUES (?)";
+            PreparedStatement insertStmt = conn.prepareStatement(insertTagSql, PreparedStatement.RETURN_GENERATED_KEYS);
+            insertStmt.setString(1, tag);
+            insertStmt.executeUpdate();
+
+            ResultSet generatedKeys = insertStmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getInt(1);  // Returner det genererede tag-id
+            } else {
+                throw new SQLException("Fejl ved oprettelse af tag.");
+            }
+        }
+    }
+
+
+
     public Set<String> getAllDescription() {
         Set<String> descriptions = new HashSet<>();
         for (TouristAttraction attraction : attractions) {
@@ -42,10 +185,6 @@ public class TouristRepository {
         return descriptions;
     }
 
-    // manipulate list
-    public List<TouristAttraction> getAllAttractions() {
-        return new ArrayList<>(attractions);
-    }
 
 
     public TouristAttraction getAttractionByName(String name) {
@@ -55,10 +194,6 @@ public class TouristRepository {
                 .orElse(null);
     }
 
-    public void addAttraction(TouristAttraction attraction) {
-        attractions.add(attraction);
-    }
-    // update
     public TouristAttraction updateAttraction(TouristAttraction updatedAttraction) {
         for (int i = 0; i < attractions.size(); i++) {
             TouristAttraction currentAttraction = attractions.get(i);
@@ -71,7 +206,28 @@ public class TouristRepository {
     }
 
     public void deleteAttraction(String name) {
+        // Korrekt SQL med kolonnenavn inkluderet
+        String deletesql = "DELETE FROM touristattraktioner WHERE Name = ?";
+
+        try (Connection connection = DriverManager.getConnection(databaseURL, username, password)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deletesql);
+
+            // Bind parameteren 'name' til SQL-forespørgslen
+            preparedStatement.setString(1, name);
+
+            // Udfør DELETE-forespørgslen
+           preparedStatement.executeUpdate();
+
+            // Log antallet af slettede rækker
+
+        } catch (SQLException e) {
+            // Håndter SQL-fejl og udskriv detaljer
+            System.err.println("Database error: " + e.getMessage());
+        }
+
+        // Fjern attraktionen fra listen 'attractions' lokalt
         attractions.removeIf(attraction -> attraction.getName().equalsIgnoreCase(name));
     }
+
 
 }

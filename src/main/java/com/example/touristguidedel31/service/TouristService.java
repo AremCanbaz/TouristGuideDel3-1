@@ -22,8 +22,11 @@ public class TouristService {
     }
 
     // Get all attractions
-    public List<TouristAttraction> getAllAttractions() {
-        return touristRepository.getAllAttractions();
+    public Set<TouristAttraction> getAllAttractions() {
+        return touristRepository.getAttractionsSet();
+    }
+    public Set<TouristAttraction> getAllAttractionSet(){
+        return touristRepository.getAttractionsSet();
     }
 
     public Set<String> getAllDistricts() {
