@@ -12,11 +12,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      PROD_DATABASE_URL: ${{secrets.PROD_DATABASE_URL}}
-      PROD_USERNAME: ${{secrets.PROD_USERNAME}}
-      PROD_PASSWORD: ${{secrets.PROD_PASSWORD}}
-
     steps:
       - uses: actions/checkout@v4
 
@@ -43,6 +38,10 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
+    env:
+      PROD_DATABASE_URL: ${{secrets.PROD_DATABASE_URL}}
+      PROD_USERNAME: ${{secrets.PROD_USERNAME}}
+      PROD_PASSWORD: ${{secrets.PROD_PASSWORD}}
   
     steps:
       - name: Download artifact from build job
